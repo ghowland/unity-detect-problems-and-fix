@@ -9,3 +9,5 @@ Instead, this is meant to be copy-pasted, and then change the bits you need to m
 The code does work from my initial testing, but is not being supplied as production quality code, just an easy to understand example.  It's purpose was clarity, since detecting and fixing problems involves understanding what's happening and not being confused about the logic of what is getting decided, or the process of testing making that harder to understand.
 
 I have a blog post about this with video examples here: 
+
+YouTube video of the falling-forever-on-the-ground problem is here: https://www.youtube.com/watch?v=d1UYwLM8G2E
