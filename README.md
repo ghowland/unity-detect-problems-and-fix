@@ -11,3 +11,5 @@ The code does work from my initial testing, but is not being supplied as product
 I have a blog post about this with video examples here: https://allhailtemos.com/blog/detecting-and-fixing-problems-unity-c-code-1
 
 YouTube video of the falling-forever-on-the-ground problem is here: https://www.youtube.com/watch?v=d1UYwLM8G2E
+
+![Example](detect_problem_and_fix.gif?raw=true "Example")
