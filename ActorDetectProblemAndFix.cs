@@ -170,7 +170,7 @@ namespace AllHailTemos
             // If we are still in the same position, as when we had the maybe-problem, OR, position is the same as the last time we checked/searched/processed this actor
             if (curPos == PosInitial || curPos == PosLastChecked)
             {
-                if (Actor_HasInputNotZero()) return true;
+                if (Actor_HasInputNotZero(parent)) return true;
             }
 
             // Made it through the gauntlet.  Did not find a problem
@@ -195,6 +195,11 @@ namespace AllHailTemos
             {
                 DiscoveredProblemMaybe(problem);
             }
+            // Else we are not maybe in a problem, so clear our data, so that we stop accumulating any time on Maybe Problems of the past.  They have to stay problems...
+            else
+            {
+                ResetData();
+            }
 
             // If we are maybe in a problem
             if (IsProblemMaybe)
@@ -206,11 +211,6 @@ namespace AllHailTemos
                     // We passed the max time threshold, and this is an actual problem now
                     DiscoveredProblem(ProblemMaybe);
                 }
-            }
-            // Else we are not maybe in a problem, so clear our data, so that we stop accumulating any time on Maybe Problems of the past.  They have to stay problems...
-            else
-            {
-                ResetData();
             }
 
             // Always get our last position here.  This is needed to START the tests for the position being the same for a long time (problem if also has Movement Input)
@@ -366,19 +366,20 @@ namespace AllHailTemos
             return Actor.Actor.GetGroundDistance();
         }
 
-        private bool Actor_HasInputNotZero()
+        private bool Actor_HasInputNotZero(ActorDetectProblemAndFix parent)
         {
             // Is this the player?  Input is in a different location
             if (Actor.IsPlayer)
             {
-                if (Actor.InputData.MoveXZ != Vector2.zero) return true;
+                // If over the threshold magnitude
+                if (Actor.InputData.MoveXZ.magnitude > parent.InputMovementMagnitudeThreshold) return true;
                 else return false;
             }
             // Else, this is an actor, so check animation moveXZ
             else
             {
                 //TODO(g): Sync this with Player's use of InputData?  I think it's a good idea.  Even just as an easy place to look...  Copy from AiAnim to Input
-                if (Actor.AI.System.Animation.MoveXZ != Vector2.zero) return true;
+                if (Actor.AI.System.Animation.MoveXZ.magnitude > parent.InputMovementMagnitudeThreshold && Actor.Stats.IsAlive()) return true;
                 else return false;
             }
         }
@@ -498,6 +499,9 @@ namespace AllHailTemos
         [Tooltip("Movement Input is being recevied, but there is not any position change.  Even with wall, there should be sliding.  Theyd have to get the angle perfect and keep it.  Test")]
         public float MaxTimeNotMovingWithInputMove = 2f;    // What if they just press into a wall?  Thats valid and would trigger this...  Make more tests inside...
 
+        [Tooltip("How much movement is needed to meet a Input Movement threshold, if less than this, they are not trying to move")]
+        public float InputMovementMagnitudeThreshold = 0.15f;
+
         [Tooltip("How long until we fix after recognizing the problem:  Airborne")]
         public float DurationToFixAirborne = 1f;
         [Tooltip("How long until we fix after recognizing the problem:  Falling")]
@@ -550,7 +554,9 @@ namespace AllHailTemos
 
                 // Determine if they have a problem, if they do, add them to the problem actors to check every frame until fixed
                 bool hasProblem = actor.DetermineProblem(this);
+
                 if (hasProblem) ProblemActors.Add(actor);
+                else actor.ResetData();
             }
 
             // Mark time we searched, so we can delay again
@@ -562,6 +568,8 @@ namespace AllHailTemos
             // Remove this actor from the ProblemActors, so we dont check them every frame.  Their problem was fixed.
             //      Remove it later, because we are iterating on it now.
             RemoveProblemActors.Add(actor);
+
+            actor.ResetData();
         }
 
         //PURPOSE: New dynamically spawned actor takes over existing ActorData, need fresh information here
