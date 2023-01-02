@@ -39,10 +39,10 @@ namespace AllHailTemos
         [Tooltip("What did we do to fix it?")]
         public ActorDetectFixType Fix;
 
-        [Tooltip("When did we first discover this may be a problem")]
+        [Tooltip("When did we first discover this is a problem-maybe")]
         public float TimeDiscoveredInitial;
 
-        [Tooltip("When did we discover it?")]
+        [Tooltip("When did we decide it was an actual problem?")]
         public float TimeDiscovered;
 
         [Tooltip("When did we fix it?")]
@@ -58,12 +58,13 @@ namespace AllHailTemos
         public ActorDetectProblemAndFixActorHistoryItem(ActorDetectProblemAndFixActor actor, ActorDetectFixType fix, float timeFixed, Vector3 posBeforeFix)
         {
             Problem = actor.ProblemCurrent;
-            ProblemMaybeLast = actor.ProblemMaybeLast;
+            ProblemMaybeLast = actor.ProblemMaybeLast;              // Saved to catch flipping before the problem was decided
 
             Fix = fix;
 
-            TimeDiscovered = actor.TimeDiscoveredProblem;   // Time the first Maybe was discovered, that lead to a problem
-            TimeFixed = timeFixed;
+            TimeDiscoveredInitial = actor.TimeDiscoveredInitial;    // Time the first Maybe was discovered
+            TimeDiscovered = actor.TimeDiscoveredProblem;           // Time the decided it was a real problem
+            TimeFixed = timeFixed;                                  // Time fixed.  Problem cleared
 
             PosInitial = actor.PosInitial;
             PosBeforeFix = posBeforeFix;
@@ -88,10 +89,10 @@ namespace AllHailTemos
         [Tooltip("What is the problem?  After ProblemMaybe is set past max time, it becomes ProblemCurrent")]
         public ActorDetectProblemType ProblemCurrent;
 
-        [Tooltip("When did we initially discover this may be a problem?")]
+        [Tooltip("When did we initially discover this is a problem-maybe?  ProblemMaybe is not-None")]
         public float TimeDiscoveredInitial;
 
-        [Tooltip("When did we discover this problem?  The first time ProblemCurrent becomes not-None, until the fix is applied")]
+        [Tooltip("When did we decide this actually problem?  The first time ProblemCurrent becomes not-None, until the fix is applied")]
         public float TimeDiscoveredProblem;
 
         [Tooltip("Problem and Fix history.  Every time we make a fix, it gets recorded here.   All discovered problems will be fixed after duration.")]
